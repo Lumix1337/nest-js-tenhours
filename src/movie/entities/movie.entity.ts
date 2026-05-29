@@ -1,17 +1,26 @@
+import { ReviewEntity } from 'src/review/entity/review.entity';
 import {
   Entity,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   Generated,
+  OneToMany,
 } from 'typeorm';
+
+export enum Genre {
+  ACTION = 'action',
+  COMEDY = 'comedy',
+  DRAMA = 'drama',
+  HORROR = 'horror',
+}
 
 @Entity({ name: 'movies' })
 export class MovieEntity {
-  @PrimaryColumn()
-  @Generated('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
+
   @Column({
     type: 'varchar',
   })
@@ -24,6 +33,7 @@ export class MovieEntity {
   description: string;
 
   @Column({
+    name: 'release_year',
     type: 'int',
     unsigned: true,
   })
@@ -37,12 +47,35 @@ export class MovieEntity {
   })
   rating: number;
 
-  @Column({ default: false })
+  @Column({
+    name: 'is_public',
+    type: 'boolean',
+    default: false,
+  })
   isPublic: boolean;
 
-  @CreateDateColumn()
+  // @Column({
+  //   type: 'date',
+  //   nullable: false,
+  // })
+  // releaseDate: string;
+  @Column({
+    type: 'enum',
+    enum: Genre,
+    default: Genre.HORROR,
+  })
+  genre: Genre;
+
+  @OneToMany(() => ReviewEntity, (review) => review.movie)
+  reviews: ReviewEntity[];
+
+  @CreateDateColumn({
+    name: 'created_at',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({
+    name: 'updated_at',
+  })
   updatedAt: Date;
 }
